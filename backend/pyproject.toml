@@ -23,6 +23,7 @@ dependencies = [
     "pyjwt<3.0.0,>=2.8.0",
     "pydantic-extra-types>=2.10.1",
     "pycountry>=24.6.1",
+    "stripe>=11.4.1",
 ]
 
 [tool.uv]

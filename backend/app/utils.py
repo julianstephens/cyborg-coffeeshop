@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -115,3 +116,7 @@ def verify_password_reset_token(token: str) -> str | None:
         return str(decoded_token["sub"])
     except InvalidTokenError:
         return None
+
+
+def parse_stripe_price(unit_amount: str) -> Decimal:
+    return Decimal(f"{unit_amount[:-2]}.{unit_amount[-2:]}")

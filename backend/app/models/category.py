@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 # Shared properties
 class CategoryBase(SQLModel):
-    name: str = Field(min_length=1, max_length=255)
+    name: str = Field(min_length=1, max_length=255, unique=True)
     description: str | None = Field(default=None, max_length=255)
 
 
