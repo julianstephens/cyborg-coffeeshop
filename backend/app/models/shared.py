@@ -1,0 +1,23 @@
+import uuid
+from datetime import datetime, timezone
+
+from sqlmodel import Field, SQLModel
+
+NOW_FACTORY = lambda: datetime.now(timezone.utc).timestamp()  # noqa: E731
+
+
+class BaseTable(SQLModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    created_at: int = Field(default_factory=NOW_FACTORY)
+    updated_at: int | None = Field(
+        default_factory=NOW_FACTORY, sa_column_kwargs={"onupdate": NOW_FACTORY}
+    )
+
+
+class ProductCategoryLink(BaseTable, table=True):
+    product_id: uuid.UUID | None = Field(
+        default=None, foreign_key="product.id", primary_key=True
+    )
+    category_id: uuid.UUID | None = Field(
+        default=None, foreign_key="category.id", primary_key=True
+    )
