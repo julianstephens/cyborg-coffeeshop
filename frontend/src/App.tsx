@@ -1,10 +1,10 @@
-import { useState } from "react";
 import "./App.css";
 import reactLogo from "./assets/react.svg";
+import { $api } from "./client";
 import viteLogo from "/vite.svg";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const { data, error } = $api.useQuery("get", "/api/v1/utils/health-check/");
 
   return (
     <>
@@ -20,6 +20,7 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+      <h3>API HEALTHY: {!error ? JSON.stringify(data) : <></>}</h3>
     </>
   );
 }
