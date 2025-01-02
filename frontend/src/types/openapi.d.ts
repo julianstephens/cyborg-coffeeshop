@@ -254,6 +254,27 @@ export interface paths {
         get?: never;
         /** Update Product Categories */
         put: operations["products-update_product_categories"];
+        /**
+         * Create Product Review
+         * @description Create new review for a given product.
+         */
+        post: operations["products-create_product_review"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/products/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Product Categories */
+        get: operations["products-read_product_categories"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -308,6 +329,54 @@ export interface paths {
          * @description Delete an order.
          */
         delete: operations["orders-delete_order"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reviews/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Reviews
+         * @description Retrieve reviews.
+         */
+        get: operations["reviews-read_reviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reviews/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Review
+         * @description Get review by ID.
+         */
+        get: operations["reviews-read_review"];
+        /**
+         * Update Review
+         * @description Update an review.
+         */
+        put: operations["reviews-update_review"];
+        post?: never;
+        /**
+         * Delete Review
+         * @description Delete an review.
+         */
+        delete: operations["reviews-delete_review"];
         options?: never;
         head?: never;
         patch?: never;
@@ -372,6 +441,13 @@ export interface components {
             /** Client Secret */
             client_secret?: string | null;
         };
+        /** CategoriesPublic */
+        CategoriesPublic: {
+            /** Data */
+            data: components["schemas"]["CategoryPublic"][];
+            /** Count */
+            count: number;
+        };
         /** Category */
         Category: {
             /**
@@ -387,6 +463,26 @@ export interface components {
             name: string;
             /** Description */
             description?: string | null;
+            /** Color */
+            color: string;
+        };
+        /** CategoryPublic */
+        CategoryPublic: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id?: string;
+            /** Created At */
+            created_at?: number;
+            /** Updated At */
+            updated_at?: number | null;
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Color */
+            color: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -507,6 +603,8 @@ export interface components {
             price: string;
             /** Available Quantity */
             available_quantity?: number | null;
+            /** Images */
+            images?: string[] | null;
             /** Categories */
             categories: components["schemas"]["Category"][];
         };
@@ -514,6 +612,50 @@ export interface components {
         ProductsPublic: {
             /** Data */
             data: components["schemas"]["ProductPublic"][];
+            /** Count */
+            count: number;
+        };
+        /** ReviewCreate */
+        ReviewCreate: {
+            /** Rating */
+            rating: number;
+            /** Content */
+            content?: string | null;
+        };
+        /** ReviewPublic */
+        ReviewPublic: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id?: string;
+            /** Created At */
+            created_at?: number;
+            /** Updated At */
+            updated_at?: number | null;
+            /** Rating */
+            rating: number;
+            /** Content */
+            content?: string | null;
+            /** Customer Id */
+            customer_id: string | null;
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+        };
+        /** ReviewUpdate */
+        ReviewUpdate: {
+            /** Rating */
+            rating?: number | null;
+            /** Content */
+            content?: string | null;
+        };
+        /** ReviewsPublic */
+        ReviewsPublic: {
+            /** Data */
+            data: components["schemas"]["ReviewPublic"][];
             /** Count */
             count: number;
         };
@@ -1164,6 +1306,61 @@ export interface operations {
             };
         };
     };
+    "products-create_product_review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewPublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    "products-read_product_categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoriesPublic"];
+                };
+            };
+        };
+    };
     "orders-read_orders": {
         parameters: {
             query?: {
@@ -1296,6 +1493,137 @@ export interface operations {
         };
     };
     "orders-delete_order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Message"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    "reviews-read_reviews": {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+                user?: string | null;
+                product?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewsPublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    "reviews-read_review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewPublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    "reviews-update_review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewPublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    "reviews-delete_review": {
         parameters: {
             query?: never;
             header?: never;
