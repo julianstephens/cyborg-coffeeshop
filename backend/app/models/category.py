@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 class CategoryBase(SQLModel):
     name: str = Field(min_length=1, max_length=255, unique=True)
     description: str | None = Field(default=None, max_length=255)
+    color: str = Field(unique=True)
 
 
 # Properties to receive on category creation
@@ -21,7 +22,8 @@ class CategoryCreate(CategoryBase):
 
 # Properties to receive on category update
 class CategoryUpdate(CategoryBase):
-    name: str | None = Field(min_length=1, max_length=255)  # type: ignore
+    color: str | None = Field(default=None)  # type: ignore
+    name: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
 
 
 # Database model, database table inferred from class name
