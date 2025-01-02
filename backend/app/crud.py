@@ -1,5 +1,7 @@
+import uuid
 from typing import Any
 
+from loguru import logger
 from sqlmodel import Session, select
 
 from app.core.security import get_password_hash, verify_password
@@ -8,6 +10,8 @@ from app.models import (
     CategoryCreate,
     Product,
     ProductCreate,
+    Review,
+    ReviewCreate,
     User,
     UserCreate,
     UserUpdate,
@@ -67,3 +71,39 @@ def create_product(*, session: Session, product_in: ProductCreate) -> Product:
     session.commit()
     session.refresh(db_item)
     return db_item
+
+
+def create_product_review(
+    *,
+    session: Session,
+    review_in: ReviewCreate,
+    product: uuid.UUID,
+    customer: uuid.UUID,
+) -> Review:
+    db_item = Review.model_validate(
+        {**review_in.model_dump(), "product_id": product, "customer_id": customer}
+    )
+    session.add(db_item)
+    session.commit()
+    session.refresh(db_item)
+    return db_item
+
+
+def update_product_categories(*, session: Session, id: uuid.UUID) -> Product:
+    product = session.exec(select(Product).where(Product.id == id)).first()
+    if not product:
+        raise ValueError
+
+    cat = session.exec(select(Category).where(Category.name == "beans")).first()
+    if cat:
+        product.categories.append(cat)
+
+    logger.debug(
+        "{count} categories in product {id}",
+        count=len(product.categories),
+        id=product.id,
+    )
+    session.add(product)
+    session.commit()
+    session.refresh(product)
+    return product

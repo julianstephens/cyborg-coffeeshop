@@ -6,6 +6,7 @@ from sqlmodel import func, select
 
 from app.api.deps import CurrentUser, SessionDep
 from app.models import (
+    CategoriesPublic,
     Category,
     Product,
     ProductPublic,
@@ -49,6 +50,14 @@ def create_product_review(
     session.commit()
     session.refresh(review)
     return review
+
+
+@router.get("/categories", response_model=CategoriesPublic)
+def read_product_categories(session: SessionDep):
+    count_statement = select(func.count()).select_from(Category)
+    count = session.exec(count_statement).one()
+    categories = session.exec(select(Category)).all()
+    return CategoriesPublic(count=count, data=categories)  # type: ignore
 
 
 @router.put("/{id}", response_model=ProductPublic)

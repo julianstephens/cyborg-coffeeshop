@@ -1,6 +1,8 @@
-from random import randint
+import random
 
 import stripe
+from faker import Faker
+from loguru import logger
 from sqlmodel import Session, create_engine, func, select
 
 from app import crud
@@ -10,6 +12,7 @@ from app.models import (
     CategoryCreate,
     Product,
     ProductCreate,
+    ReviewCreate,
     User,
     UserCreate,
 )
@@ -23,6 +26,8 @@ engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 # for more details: https://github.com/fastapi/full-stack-fastapi-template/issues/28
 
 
+fake = Faker()
+
 stripe.api_key = settings.STRIPE_API_KEY
 
 
@@ -30,10 +35,12 @@ def create_products(session: Session):
     count_statement = select(func.count()).select_from(Product)
     count = session.exec(count_statement).one()
     if count > 0:
-        return
+        return []
 
     products = stripe.Product.list()
     prices = stripe.Price.list()
+
+    created = []
     for p in products:
         try:
             price = next(i for i in prices if i.product == p.id)
@@ -47,9 +54,17 @@ def create_products(session: Session):
             name=p.name,
             description=p.description,
             price=parse_stripe_price(price.unit_amount_decimal),
-            available_quantity=randint(0, 100),
+            available_quantity=random.randint(0, 100),
+            images=p.images if len(p.images) > 0 else None,  # type: ignore
         )
-        crud.create_product(session=session, product_in=prod_in)
+
+        p = crud.create_product(session=session, product_in=prod_in)
+        crud.update_product_categories(
+            session=session,
+            id=p.id,
+        )
+        created.append(p)
+    return created
 
 
 def init_db(session: Session) -> None:
@@ -77,7 +92,18 @@ def init_db(session: Session) -> None:
     if len(categories) == 0:
         cats = ["beans", "accessories"]
         for c in cats:
-            c_in = CategoryCreate(name=c)
+            c_in = CategoryCreate(
+                name=c, color=random.choice(["teal", "purple", "blue", "red", "green"])
+            )
             crud.create_category(session=session, category_in=c_in)
 
-    create_products(session)
+    products = create_products(session)
+    logger.debug("created {num_prod} products", num_prod=len(products))
+
+    for p in products:
+        rating = round(random.uniform(0.5, 5) * 2) / 2
+        content = fake.paragraph() if random.randint(1, 2) == 1 else None
+        review_in = ReviewCreate(rating=rating, content=content)
+        crud.create_product_review(
+            session=session, review_in=review_in, product=p.id, customer=user.id
+        )
