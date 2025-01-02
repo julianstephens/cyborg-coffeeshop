@@ -33,9 +33,9 @@ class Category(CategoryBase, BaseTable, table=True):
 
 # Properties to return via API, id is always required
 class CategoryPublic(CategoryBase, BaseTable):
-    products: list["Product"]
+    pass
 
 
-class CategorysPublic(SQLModel):
+class CategoriesPublic(SQLModel):
     data: list[CategoryPublic]
     count: int

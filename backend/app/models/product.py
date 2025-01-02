@@ -18,7 +18,6 @@ class ProductBase(SQLModel):
     currency: ISO4217 = Field(default="USD")
     price: Decimal = Field(max_digits=10, decimal_places=2)
     available_quantity: int | None = Field(default=None)
-    rating: float | None = Field(default=None)
 
 
 # Properties to receive on product creation
