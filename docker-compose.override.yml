@@ -98,6 +98,7 @@ services:
       - "5173:80"
     build:
       context: ./frontend
+      target: dev
       args:
         - VITE_API_URL=http://localhost:8000
         - NODE_ENV=development

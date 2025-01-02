@@ -142,6 +142,7 @@ services:
       - default
     build:
       context: ./frontend
+      target: prod
       args:
         - VITE_API_URL=https://api.${DOMAIN?Variable not set}
         - NODE_ENV=production
