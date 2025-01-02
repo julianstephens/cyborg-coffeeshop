@@ -2,7 +2,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from pydantic_extra_types.currency_code import ISO4217
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import ARRAY, Column, Field, Relationship, SQLModel, String
 
 from .category import Category
 from .shared import BaseTable, ProductCategoryLink
@@ -18,6 +18,7 @@ class ProductBase(SQLModel):
     currency: ISO4217 = Field(default="USD")
     price: Decimal = Field(max_digits=10, decimal_places=2)
     available_quantity: int | None = Field(default=None)
+    images: list[str] = Field(default=None, max_items=5)
 
 
 # Properties to receive on product creation
@@ -31,6 +32,9 @@ class Product(ProductBase, BaseTable, table=True):
         back_populates="products", link_model=ProductCategoryLink
     )
     reviews: list["Review"] = Relationship(back_populates="product")
+    images: list[str] = Field(
+        sa_column=Column(ARRAY(String), nullable=True), default=None
+    )  # type: ignore
 
 
 # Properties to return via API, id is always required
