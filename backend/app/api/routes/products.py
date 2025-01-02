@@ -5,7 +5,15 @@ from fastapi import APIRouter, HTTPException, status
 from sqlmodel import func, select
 
 from app.api.deps import CurrentUser, SessionDep
-from app.models import Category, Product, ProductPublic, ProductsPublic
+from app.models import (
+    Category,
+    Product,
+    ProductPublic,
+    ProductsPublic,
+    Review,
+    ReviewCreate,
+    ReviewPublic,
+)
 
 router = APIRouter()
 
@@ -21,6 +29,26 @@ def read_products(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
     products = session.exec(statement).all()
 
     return ProductsPublic(data=products, count=count)  # type: ignore
+
+
+@router.post("/{id}", response_model=ReviewPublic)
+def create_product_review(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    id: uuid.UUID,
+    review_in: ReviewCreate,
+) -> Any:
+    """
+    Create new review for a given product.
+    """
+    review = Review.model_validate(
+        review_in, update={"customer_id": current_user.id, "product_id": id}
+    )
+    session.add(review)
+    session.commit()
+    session.refresh(review)
+    return review
 
 
 @router.put("/{id}", response_model=ProductPublic)

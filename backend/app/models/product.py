@@ -1,10 +1,14 @@
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from pydantic_extra_types.currency_code import ISO4217
 from sqlmodel import Field, Relationship, SQLModel
 
 from .category import Category
 from .shared import BaseTable, ProductCategoryLink
+
+if TYPE_CHECKING:
+    from .review import Review
 
 
 # Shared properties
@@ -14,6 +18,7 @@ class ProductBase(SQLModel):
     currency: ISO4217 = Field(default="USD")
     price: Decimal = Field(max_digits=10, decimal_places=2)
     available_quantity: int | None = Field(default=None)
+    rating: float | None = Field(default=None)
 
 
 # Properties to receive on product creation
@@ -26,6 +31,7 @@ class Product(ProductBase, BaseTable, table=True):
     categories: list[Category] = Relationship(
         back_populates="products", link_model=ProductCategoryLink
     )
+    reviews: list["Review"] = Relationship(back_populates="product")
 
 
 # Properties to return via API, id is always required
