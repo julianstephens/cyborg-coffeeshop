@@ -9,7 +9,7 @@ from .shared import BaseTable, ProductCategoryLink
 
 # Shared properties
 class ProductBase(SQLModel):
-    name: str = Field(min_length=1, max_length=255)
+    name: str = Field(min_length=1, max_length=255, unique=True)
     description: str | None = Field(default=None, max_length=255)
     currency: ISO4217 = Field(default="USD")
     price: Decimal = Field(max_digits=10, decimal_places=2)

@@ -1,11 +1,18 @@
 from random import randint
 
 import stripe
-from sqlmodel import Session, create_engine, select
+from sqlmodel import Session, create_engine, func, select
 
 from app import crud
 from app.core.config import settings
-from app.models import Category, CategoryCreate, ProductCreate, User, UserCreate
+from app.models import (
+    Category,
+    CategoryCreate,
+    Product,
+    ProductCreate,
+    User,
+    UserCreate,
+)
 from app.utils import parse_stripe_price
 
 engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
@@ -20,6 +27,11 @@ stripe.api_key = settings.STRIPE_API_KEY
 
 
 def create_products(session: Session):
+    count_statement = select(func.count()).select_from(Product)
+    count = session.exec(count_statement).one()
+    if count > 0:
+        return
+
     products = stripe.Product.list()
     prices = stripe.Price.list()
     for p in products:
