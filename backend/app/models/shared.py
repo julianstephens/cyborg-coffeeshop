@@ -6,6 +6,11 @@ from sqlmodel import Field, SQLModel
 NOW_FACTORY = lambda: datetime.now(timezone.utc).timestamp()  # noqa: E731
 
 
+# Generic message
+class Message(SQLModel):
+    message: str
+
+
 class BaseTable(SQLModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     created_at: int = Field(default_factory=NOW_FACTORY)

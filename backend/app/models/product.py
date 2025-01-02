@@ -21,13 +21,6 @@ class ProductCreate(ProductBase):
     pass
 
 
-# Properties to receive on product update
-class ProductUpdate(ProductBase):
-    name: str | None = Field(min_length=1, max_length=255)  # type: ignore
-    currency: ISO4217 | None = Field(default="USD")  # type: ignore
-    price: Decimal | None = Field(max_digits=10, decimal_places=2)  # type: ignore
-
-
 # Database model, database table inferred from class name
 class Product(ProductBase, BaseTable, table=True):
     categories: list[Category] = Relationship(

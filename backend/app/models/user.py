@@ -6,7 +6,7 @@ from sqlmodel import Field, Relationship, SQLModel
 from .shared import BaseTable
 
 if TYPE_CHECKING:
-    from .item import Item
+    from .order import Order
 
 
 # Shared properties
@@ -47,7 +47,9 @@ class UpdatePassword(SQLModel):
 # Database model, database table inferred from class name
 class User(UserBase, BaseTable, table=True):
     hashed_password: str
-    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    orders: list["Order"] = Relationship(
+        back_populates="customer", cascade_delete=False
+    )
 
 
 # Properties to return via API, id is always required

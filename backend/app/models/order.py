@@ -1,10 +1,12 @@
+import uuid
 from decimal import Decimal
 from enum import StrEnum
 
 from pydantic_extra_types.currency_code import ISO4217
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
 
 from .shared import BaseTable
+from .user import User
 
 
 class OrderStatus(StrEnum):
@@ -39,12 +41,15 @@ class OrderUpdate(OrderBase):
 
 # Database model, database table inferred from class name
 class Order(OrderBase, BaseTable, table=True):
-    pass
+    customer_id: uuid.UUID | None = Field(
+        foreign_key="user.id", nullable=True, ondelete="SET NULL"
+    )
+    customer: User | None = Relationship(back_populates="orders")
 
 
 # Properties to return via API, id is always required
 class OrderPublic(OrderBase, BaseTable):
-    pass
+    customer_id: uuid.UUID | None
 
 
 class OrdersPublic(SQLModel):
