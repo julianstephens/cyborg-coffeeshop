@@ -7,6 +7,7 @@ from .shared import BaseTable
 
 if TYPE_CHECKING:
     from .order import Order
+    from .review import Review
 
 
 # Shared properties
@@ -48,6 +49,9 @@ class UpdatePassword(SQLModel):
 class User(UserBase, BaseTable, table=True):
     hashed_password: str
     orders: list["Order"] = Relationship(
+        back_populates="customer", cascade_delete=False
+    )
+    reviews: list["Review"] = Relationship(
         back_populates="customer", cascade_delete=False
     )
 
