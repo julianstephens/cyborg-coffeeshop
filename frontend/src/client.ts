@@ -2,10 +2,9 @@ import type { paths } from "@/types";
 import createFetchClient, { Middleware } from "openapi-fetch";
 import createClient from "openapi-react-query";
 
-const accessToken = localStorage.getItem("accessToken");
-
 const authMiddleware: Middleware = {
   onRequest: async ({ request }) => {
+    const accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
       request.headers.append(
         "Authorization",
