@@ -1,9 +1,9 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlmodel import Field, SQLModel
 
-NOW_FACTORY = lambda: datetime.now(timezone.utc).timestamp()  # noqa: E731
+NOW_FACTORY = lambda: datetime.now(UTC).timestamp()  # noqa: E731
 
 
 # Generic message
@@ -25,4 +25,13 @@ class ProductCategoryLink(BaseTable, table=True):
     )
     category_id: uuid.UUID | None = Field(
         default=None, foreign_key="category.id", primary_key=True
+    )
+
+
+class OrderAddressLink(BaseTable, table=True):
+    order_id: uuid.UUID | None = Field(
+        default=None, foreign_key="order.id", primary_key=True
+    )
+    address_id: uuid.UUID | None = Field(
+        default=None, foreign_key="address.id", primary_key=True
     )

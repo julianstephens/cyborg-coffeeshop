@@ -30,7 +30,7 @@ class OrderItemUpdate(OrderItemBase):
 # Database model, database table inferred from class name
 class OrderItem(OrderItemBase, BaseTable, table=True):
     order_id: uuid.UUID = Field(foreign_key="order.id", ondelete="CASCADE")
-    order: "Order" = Relationship(back_populates="order_items")
+    order: "Order" = Relationship(back_populates="items")
     product_id: uuid.UUID | None = Field(
         foreign_key="product.id", nullable=True, ondelete="SET NULL"
     )

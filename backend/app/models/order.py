@@ -7,7 +7,7 @@ from sqlmodel import Column, Enum, Field, Relationship, SQLModel
 
 from .address import Address
 from .order_item import OrderItem
-from .shared import BaseTable
+from .shared import BaseTable, OrderAddressLink
 from .user import User
 
 
@@ -57,22 +57,20 @@ class Order(OrderBase, BaseTable, table=True):
         foreign_key="user.id", nullable=True, ondelete="SET NULL"
     )
     customer: User | None = Relationship(back_populates="orders")
-    billing_address_id: uuid.UUID | None = Field(
-        foreign_key="address.id", nullable=True, ondelete="SET NULL"
+    billing_address: Address = Relationship(
+        cascade_delete=False, link_model=OrderAddressLink
     )
-    billing_address: Address = Relationship(cascade_delete=False)
-    shipping_address_id: uuid.UUID | None = Field(
-        foreign_key="address.id", nullable=True, ondelete="SET NULL"
+    shipping_address: Address = Relationship(
+        cascade_delete=False, link_model=OrderAddressLink
     )
-    shipping_address: Address = Relationship(cascade_delete=False)
     items: list[OrderItem] = Relationship(back_populates="order", cascade_delete=True)
 
 
 # Properties to return via API, id is always required
 class OrderPublic(OrderBase, BaseTable):
     customer_id: uuid.UUID | None
-    billing_address: uuid.UUID | None
-    shipping_address: uuid.UUID | None
+    billing_address: Address
+    shipping_address: Address
     items: list[OrderItem]
 
 
