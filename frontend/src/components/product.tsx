@@ -9,10 +9,13 @@ import {
   HStack,
   Icon,
   Image,
+  Skeleton,
   Text,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { HiStar } from "react-icons/hi";
+
+const ITEM_SIZE = "200px";
 
 const Ratings = ({ reviews }: { reviews?: Review[] }) => {
   return (
@@ -57,24 +60,49 @@ export const ProductCard = ({ prod }: { prod: Product }) => {
   }, [data]);
 
   return (
-    <Box maxW={"xs"} borderWidth={"1px"}>
-      <Image src={productPlaceholder} alt={prod.name} />
-      <Box p={"2"} spaceY="2">
-        <Flex justifyContent={"space-between"}>
-          <Text fontWeight={"medium"}>{prod.name}</Text>
-          <Text color="fg.muted">
-            ${prod.price} {prod.currency}
-          </Text>
-        </Flex>
-        <HStack p="0">
-          {prod.categories.length > 0 && (
-            <For each={prod.categories}>
-              {(item) => <Badge bg={`${item.color}.500`}>{item.name}</Badge>}
-            </For>
-          )}
-          <Ratings reviews={productReviews[prod.id!]} />
-        </HStack>
-      </Box>
-    </Box>
+    <>
+      {isLoading ? (
+        <Skeleton h={ITEM_SIZE} w="full" loading={isLoading}></Skeleton>
+      ) : (
+        <Box
+          id="productCardBox"
+          _hover={{ shadow: "xl" }}
+          cursor="pointer"
+          maxW={"xs"}
+          borderWidth={"1px"}
+        >
+          <Image
+            w="full"
+            maxH={ITEM_SIZE}
+            src={
+              prod.images && prod.images.length > 0
+                ? prod.images[0]
+                : productPlaceholder
+            }
+            alt={prod.name}
+          />
+          <Box id="productCardDetailsBox" p={"2"} spaceY="2">
+            <Flex justifyContent={"space-between"}>
+              <Text fontWeight={"medium"}>{prod.name}</Text>
+              <Text color="fg.muted">
+                ${prod.price} {prod.currency}
+              </Text>
+            </Flex>
+            <HStack p="0">
+              {prod.categories.length > 0 && (
+                <For each={prod.categories}>
+                  {(item, index) => (
+                    <Badge key={index} bg={`${item.color}.500`}>
+                      {item.name}
+                    </Badge>
+                  )}
+                </For>
+              )}
+              <Ratings reviews={productReviews[prod.id!]} />
+            </HStack>
+          </Box>
+        </Box>
+      )}
+    </>
   );
 };

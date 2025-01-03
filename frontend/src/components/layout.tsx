@@ -2,7 +2,7 @@ import { currentUserAtom } from "@/atoms";
 import { Avatar } from "@/components/ui/avatar";
 import type { ChildrenProps } from "@/types";
 import { Box, Container, Flex, Text } from "@chakra-ui/react";
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { useLocation, useNavigate } from "react-router";
 
 const colorPalette = ["red", "blue", "green", "yellow", "purple", "orange"];
@@ -13,12 +13,12 @@ const Header = () => {
     return colorPalette[index];
   };
 
-  const [user] = useAtom(currentUserAtom);
+  const { data: user } = useAtomValue(currentUserAtom);
 
   const goto = useNavigate();
 
   return (
-    <Flex pb={"4"} width={"full"} justifyContent={"space-between"}>
+    <Flex pb="4" width="full" justifyContent="space-between">
       <Text fontSize={"xl"} fontWeight={"bold"}>
         Cyborg Coffeeshop
       </Text>
@@ -47,7 +47,13 @@ export const Layout = ({ children }: ChildrenProps) => {
   const { pathname } = useLocation();
 
   return (
-    <Container fluid={true} maxWidth={"full"} padding={"8"}>
+    <Container
+      id="layoutContainer"
+      fluid={true}
+      maxWidth={"full"}
+      h="100%"
+      padding={"8"}
+    >
       {pathname != "/login" && <Header />}
       {children}
     </Container>
