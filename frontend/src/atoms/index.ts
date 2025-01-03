@@ -13,8 +13,10 @@ export const currentUserAtom = atomWithQuery(() => ({
     return data ?? null;
   },
 }));
+currentUserAtom.debugLabel = "currentUser";
 
 export const accessTokenAtom = atomWithStorage<string | null>(
   "accessToken",
   null
 );
+accessTokenAtom.debugLabel = "accessToken";
