@@ -3,8 +3,10 @@ from decimal import Decimal
 from enum import StrEnum
 
 from pydantic_extra_types.currency_code import ISO4217
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Column, Enum, Field, Relationship, SQLModel
 
+from .address import Address
+from .order_item import OrderItem
 from .shared import BaseTable
 from .user import User
 
@@ -17,13 +19,23 @@ class OrderStatus(StrEnum):
     CANCELLED = "cancelled"
 
 
+class PaymentMethod(StrEnum):
+    STRIPE = "stripe"
+    PAYPAL = "paypal"
+
+
 # Shared properties
 class OrderBase(SQLModel):
-    status: OrderStatus = Field(default=OrderStatus.PENDING)
-    description: str | None = Field(default=None, max_length=255)
+    status: OrderStatus = Field(
+        default=OrderStatus.PENDING,
+        sa_column=Column(Enum(OrderStatus), default=OrderStatus.PENDING),
+    )
     currency: ISO4217 = Field(default="USD")
     total_price: Decimal = Field(max_digits=30, decimal_places=2)
-    available_quantity: int | None = Field(default=None)
+    payment_method: PaymentMethod = Field(
+        default=PaymentMethod.STRIPE,
+        sa_column=Column(Enum(PaymentMethod), default=PaymentMethod.STRIPE),
+    )
 
 
 # Properties to receive on order creation
@@ -45,11 +57,23 @@ class Order(OrderBase, BaseTable, table=True):
         foreign_key="user.id", nullable=True, ondelete="SET NULL"
     )
     customer: User | None = Relationship(back_populates="orders")
+    billing_address_id: uuid.UUID | None = Field(
+        foreign_key="address.id", nullable=True, ondelete="SET NULL"
+    )
+    billing_address: Address = Relationship(cascade_delete=False)
+    shipping_address_id: uuid.UUID | None = Field(
+        foreign_key="address.id", nullable=True, ondelete="SET NULL"
+    )
+    shipping_address: Address = Relationship(cascade_delete=False)
+    items: list[OrderItem] = Relationship(back_populates="order", cascade_delete=True)
 
 
 # Properties to return via API, id is always required
 class OrderPublic(OrderBase, BaseTable):
     customer_id: uuid.UUID | None
+    billing_address: uuid.UUID | None
+    shipping_address: uuid.UUID | None
+    items: list[OrderItem]
 
 
 class OrdersPublic(SQLModel):

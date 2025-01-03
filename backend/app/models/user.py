@@ -6,6 +6,8 @@ from sqlmodel import Field, Relationship, SQLModel
 from .shared import BaseTable
 
 if TYPE_CHECKING:
+    from .address import Address
+    from .cart import Cart
     from .order import Order
     from .review import Review
 
@@ -53,6 +55,10 @@ class User(UserBase, BaseTable, table=True):
     )
     reviews: list["Review"] = Relationship(
         back_populates="customer", cascade_delete=False
+    )
+    cart: list["Cart"] = Relationship(back_populates="customer", cascade_delete=True)
+    addresses: list["Address"] = Relationship(
+        back_populates="customer", cascade_delete=True
     )
 
 
