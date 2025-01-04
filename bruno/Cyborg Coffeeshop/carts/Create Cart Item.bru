@@ -1,0 +1,25 @@
+meta {
+  name: Create Cart Item
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/v1/carts/:id/items
+  body: json
+  auth: none
+}
+
+params:query {
+  product_id:
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "quantity": ""
+  }
+}

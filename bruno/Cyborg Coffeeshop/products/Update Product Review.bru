@@ -1,0 +1,23 @@
+meta {
+  name: Update Product Review
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/api/v1/products/:id/reviews/:review_id
+  body: json
+  auth: none
+}
+
+params:path {
+  id:
+  review_id:
+}
+
+body:json {
+  {
+    "rating": "",
+    "content": ""
+  }
+}

@@ -1,0 +1,26 @@
+meta {
+  name: Create Order Item
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/v1/orders/:id/items
+  body: json
+  auth: none
+}
+
+params:query {
+  product_id:
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "quantity": "",
+    "final_price": ""
+  }
+}

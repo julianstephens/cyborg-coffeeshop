@@ -1,0 +1,5 @@
+script:pre-request {
+  if (bru.hasEnvVar("token")) {
+    req.setHeader("Authorization", `Bearer ${bru.getEnvVar('token')}`)
+  }
+}

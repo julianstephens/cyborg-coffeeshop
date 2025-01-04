@@ -4,7 +4,6 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, HTTPException, Security, status
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from loguru import logger
 
 from app import crud
 from app.api.deps import (
@@ -33,7 +32,6 @@ def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
-    logger.debug(form_data)
     user = crud.authenticate(
         session=session, email=form_data.username, password=form_data.password
     )

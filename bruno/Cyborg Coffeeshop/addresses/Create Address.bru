@@ -1,0 +1,21 @@
+meta {
+  name: Create Address
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/addresses/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "street": "",
+    "city": "",
+    "state": "",
+    "postal_code": "",
+    "country": ""
+  }
+}

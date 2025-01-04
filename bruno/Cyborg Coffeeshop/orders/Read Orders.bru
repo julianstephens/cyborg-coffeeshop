@@ -1,0 +1,16 @@
+meta {
+  name: Read Orders
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/orders/
+  body: none
+  auth: none
+}
+
+params:query {
+  ~skip:
+  ~limit:
+}

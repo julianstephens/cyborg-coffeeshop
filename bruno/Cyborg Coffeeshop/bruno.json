@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Cyborg Coffeeshop",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

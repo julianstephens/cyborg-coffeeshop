@@ -1,0 +1,18 @@
+meta {
+  name: Update User Me
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/users/me
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "full_name": "",
+    "email": ""
+  }
+}

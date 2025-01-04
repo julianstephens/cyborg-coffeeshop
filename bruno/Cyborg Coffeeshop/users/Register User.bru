@@ -1,0 +1,19 @@
+meta {
+  name: Register User
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/v1/users/signup
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "",
+    "password": "",
+    "full_name": ""
+  }
+}

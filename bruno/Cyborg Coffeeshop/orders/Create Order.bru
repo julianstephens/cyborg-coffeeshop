@@ -1,0 +1,23 @@
+meta {
+  name: Create Order
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/orders/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "stripe_checkout_session": "",
+    "stripe_payment_intent": "",
+    "status": "",
+    "currency": "",
+    "total_price": "",
+    "payment_method": "",
+    "stale_at": ""
+  }
+}

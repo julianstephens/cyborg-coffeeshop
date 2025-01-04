@@ -1,0 +1,16 @@
+meta {
+  name: Read Carts
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/carts/
+  body: none
+  auth: none
+}
+
+params:query {
+  ~skip:
+  ~limit:
+}

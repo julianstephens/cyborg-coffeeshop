@@ -1,0 +1,21 @@
+meta {
+  name: Update Product Categories
+  type: http
+  seq: 9
+}
+
+put {
+  url: {{baseUrl}}/api/v1/products/:id/categories
+  body: json
+  auth: none
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  [
+    {}
+  ]
+}

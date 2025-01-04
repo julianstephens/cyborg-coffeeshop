@@ -1,0 +1,15 @@
+meta {
+  name: Delete Order
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/orders/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id:
+}

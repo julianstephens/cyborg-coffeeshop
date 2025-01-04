@@ -1,0 +1,22 @@
+meta {
+  name: Create Product Review
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/products/:id/reviews
+  body: json
+  auth: none
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "rating": "",
+    "content": ""
+  }
+}

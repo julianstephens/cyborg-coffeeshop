@@ -1,0 +1,27 @@
+meta {
+  name: Update Order
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/api/v1/orders/:id
+  body: json
+  auth: none
+}
+
+params:path {
+  id:
+}
+
+body:json {
+  {
+    "stripe_checkout_session": "",
+    "stripe_payment_intent": "",
+    "status": "",
+    "currency": "",
+    "total_price": "",
+    "payment_method": "",
+    "stale_at": ""
+  }
+}
