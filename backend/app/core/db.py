@@ -51,6 +51,7 @@ def create_products(session: Session):
             continue
 
         prod_in = ProductCreate(
+            stripe_id=p.id,
             name=p.name,
             description=p.description,
             price=parse_stripe_price(price.unit_amount_decimal),
@@ -58,12 +59,12 @@ def create_products(session: Session):
             images=p.images if len(p.images) > 0 else None,  # type: ignore
         )
 
-        p = crud.create_product(session=session, product_in=prod_in)
+        new_prod = crud.create_product(session=session, product_in=prod_in)
         crud.update_product_categories(
             session=session,
-            id=p.id,
+            id=new_prod.id,
         )
-        created.append(p)
+        created.append(new_prod)
     return created
 
 
@@ -82,6 +83,7 @@ def init_db(session: Session) -> None:
     ).first()
     if not user:
         user_in = UserCreate(
+            full_name="John Doe",
             email=settings.FIRST_SUPERUSER,
             password=settings.FIRST_SUPERUSER_PASSWORD,
             is_superuser=True,

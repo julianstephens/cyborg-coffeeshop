@@ -8,6 +8,9 @@ from app.core.security import get_password_hash, verify_password
 from app.models import (
     Category,
     CategoryCreate,
+    Order,
+    OrderCreate,
+    OrderUpdate,
     Product,
     ProductCreate,
     Review,
@@ -81,7 +84,7 @@ def create_product_review(
     customer: uuid.UUID,
 ) -> Review:
     db_item = Review.model_validate(
-        {**review_in.model_dump(), "product_id": product, "customer_id": customer}
+        review_in, update={"product_id": product, "customer_id": customer}
     )
     session.add(db_item)
     session.commit()
@@ -107,3 +110,22 @@ def update_product_categories(*, session: Session, id: uuid.UUID) -> Product:
     session.commit()
     session.refresh(product)
     return product
+
+
+def create_order(
+    *, session: Session, order_in: OrderCreate, customer: uuid.UUID
+) -> Order:
+    db_item = Order.model_validate(order_in, update={"customer_id": customer})
+    session.add(db_item)
+    session.commit()
+    session.refresh(db_item)
+    return db_item
+
+
+def update_order(*, session: Session, db_order: Order, order_in: OrderUpdate) -> Order:
+    order_data = order_in.model_dump(exclude_unset=True)
+    db_order.sqlmodel_update(order_data)
+    session.add(db_order)
+    session.commit()
+    session.refresh(db_order)
+    return db_order

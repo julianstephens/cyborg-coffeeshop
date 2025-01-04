@@ -15,7 +15,7 @@ from app.api.deps import (
 from app.core import security
 from app.core.config import settings
 from app.core.security import get_password_hash
-from app.models import Message, NewPassword, Token, User
+from app.models import Message, NewPassword, Token, User, UserPublic
 from app.utils import (
     generate_password_reset_token,
     generate_reset_password_email,
@@ -62,7 +62,7 @@ def test_token(
     """
     Test access token
     """
-    return {"user": current_user, "scopes": scopes}
+    return {"user": UserPublic(**current_user.model_dump()), "scopes": scopes}
 
 
 @router.post("/password-recovery/{email}")
@@ -74,7 +74,7 @@ def recover_password(email: str, session: SessionDep) -> Message:
 
     if not user:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="The user with this email does not exist in the system.",
         )
     password_reset_token = generate_password_reset_token(email=email)
@@ -96,15 +96,19 @@ def reset_password(session: SessionDep, body: NewPassword) -> Message:
     """
     email = verify_password_reset_token(token=body.token)
     if not email:
-        raise HTTPException(status_code=400, detail="Invalid token")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token"
+        )
     user = crud.get_user_by_email(session=session, email=email)
     if not user:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="The user with this email does not exist in the system.",
         )
     elif not user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
+        )
     hashed_password = get_password_hash(password=body.new_password)
     user.hashed_password = hashed_password
     session.add(user)
@@ -125,7 +129,7 @@ def recover_password_html_content(email: str, session: SessionDep) -> Any:
 
     if not user:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="The user with this username does not exist in the system.",
         )
     password_reset_token = generate_password_reset_token(email=email)

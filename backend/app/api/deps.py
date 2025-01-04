@@ -104,8 +104,6 @@ def get_scopes(token: TokenDep):
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
-        if "scopes" in payload and isinstance(payload["scopes"], list):
-            payload["scopes"] = " ".join(payload["scopes"])
         token_data = TokenPayload.model_validate(payload)
     except (InvalidTokenError, ValidationError):
         logger.exception("something went wrong validating credentials")

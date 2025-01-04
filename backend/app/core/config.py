@@ -1,6 +1,6 @@
 import secrets
 import warnings
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import (
     AnyUrl,
@@ -12,7 +12,6 @@ from pydantic import (
 )
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing_extensions import Self
 
 
 def parse_cors(v: Any) -> list[str] | str:
@@ -74,7 +73,10 @@ class Settings(BaseSettings):
     SMTP_HOST: str | None = None
     SMTP_USER: str | None = None
     SMTP_PASSWORD: str | None = None
+
     STRIPE_API_KEY: str
+    STRIPE_WEBHOOK_SECRET: str | None = None
+
     # TODO: update type to EmailStr when sqlmodel supports it
     EMAILS_FROM_EMAIL: str | None = None
     EMAILS_FROM_NAME: str | None = None
@@ -116,7 +118,6 @@ class Settings(BaseSettings):
         self._check_default_secret(
             "FIRST_SUPERUSER_PASSWORD", self.FIRST_SUPERUSER_PASSWORD
         )
-        self._check_default_secret("STRIPE_API_KEY", self.STRIPE_API_KEY)
 
         return self
 
