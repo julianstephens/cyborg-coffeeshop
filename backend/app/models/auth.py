@@ -9,7 +9,9 @@ class Token(SQLModel):
 
 # Contents of JWT token
 class TokenPayload(SQLModel):
+    exp: int
     sub: str | None = None
+    scopes: list[str]
 
 
 class NewPassword(SQLModel):

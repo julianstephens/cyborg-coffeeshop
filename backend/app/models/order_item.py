@@ -39,7 +39,7 @@ class OrderItem(OrderItemBase, BaseTable, table=True):
 
 # Properties to return via API, id is always required
 class OrderItemPublic(OrderItemBase, BaseTable):
-    pass
+    product_id: uuid.UUID
 
 
 class OrderItemsPublic(SQLModel):

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import jwt
@@ -12,10 +12,12 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "HS256"
 
 
-def create_access_token(subject: str | Any, expires_delta: timedelta) -> str:
-    expire = datetime.now(timezone.utc) + expires_delta
-    to_encode = {"exp": expire, "sub": str(subject)}
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
+def create_access_token(
+    subject: str | Any, expires_delta: timedelta, scopes: str
+) -> str:
+    expire = datetime.now(UTC) + expires_delta
+    claims = {"exp": expire, "sub": str(subject), "scopes": scopes}
+    encoded_jwt = jwt.encode(claims, settings.SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 

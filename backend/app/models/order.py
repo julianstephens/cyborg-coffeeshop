@@ -57,10 +57,7 @@ class Order(OrderBase, BaseTable, table=True):
         foreign_key="user.id", nullable=True, ondelete="SET NULL"
     )
     customer: User | None = Relationship(back_populates="orders")
-    billing_address: Address = Relationship(
-        cascade_delete=False, link_model=OrderAddressLink
-    )
-    shipping_address: Address = Relationship(
+    addresses: list[Address] = Relationship(
         cascade_delete=False, link_model=OrderAddressLink
     )
     items: list[OrderItem] = Relationship(back_populates="order", cascade_delete=True)
@@ -69,8 +66,7 @@ class Order(OrderBase, BaseTable, table=True):
 # Properties to return via API, id is always required
 class OrderPublic(OrderBase, BaseTable):
     customer_id: uuid.UUID | None
-    billing_address: Address
-    shipping_address: Address
+    addresses: list[Address]
     items: list[OrderItem]
 
 

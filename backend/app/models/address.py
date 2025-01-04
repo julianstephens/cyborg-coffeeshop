@@ -49,6 +49,6 @@ class AddressPublic(AddressBase, BaseTable):
     customer_id: uuid.UUID | None
 
 
-class AddresssPublic(SQLModel):
+class AddressesPublic(SQLModel):
     data: list[AddressPublic]
     count: int
