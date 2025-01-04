@@ -1,28 +1,19 @@
 import uuid
-from decimal import Decimal
-from enum import StrEnum
 
-from pydantic_extra_types.country import CountryShortName
-from pydantic_extra_types.currency_code import ISO4217
+from pydantic_extra_types.country import CountryAlpha2
 from sqlmodel import Field, Relationship, SQLModel
 
 from .shared import BaseTable
 from .user import User
 
 
-class AddressType(StrEnum):
-    BILLING = "billing"
-    SHIPPING = "shipping"
-
-
 # Shared properties
 class AddressBase(SQLModel):
-    address_type: AddressType
     street: str
     city: str
     state: str
     postal_code: str
-    country: CountryShortName
+    country: CountryAlpha2
 
 
 # Properties to receive on address creation
@@ -32,10 +23,11 @@ class AddressCreate(AddressBase):
 
 # Properties to receive on address update
 class AddressUpdate(AddressBase):
-    name: str | None = Field(min_length=1, max_length=255)  # type: ignore
-    currency: ISO4217 | None = Field(default="USD")  # type: ignore
-    price: Decimal | None = Field(max_digits=10, decimal_places=2)  # type: ignore
-    available_quantity: int | None = Field(default=None)
+    street: str | None = Field(default=None)  # type: ignore
+    city: str | None = Field(default=None)  # type: ignore
+    state: str | None = Field(default=None)  # type: ignore
+    postal_code: str | None = Field(default=None)  # type: ignore
+    country: CountryAlpha2 | None = Field(default=None)  # type: ignore
 
 
 # Database model, database table inferred from class name

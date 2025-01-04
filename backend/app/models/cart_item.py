@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel
 
+from .product import Product
 from .shared import BaseTable
 
 if TYPE_CHECKING:
     from .cart import Cart
-    from .product import Product
 
 
 # Shared properties
@@ -32,12 +32,12 @@ class CartItem(CartItemBase, BaseTable, table=True):
     product_id: uuid.UUID | None = Field(
         foreign_key="product.id", nullable=True, ondelete="SET NULL"
     )
-    product: "Product" = Relationship(cascade_delete=False)
+    product: Product = Relationship(cascade_delete=False)
 
 
 # Properties to return via API, id is always required
 class CartItemPublic(CartItemBase, BaseTable):
-    pass
+    product: Product
 
 
 class CartItemsPublic(SQLModel):

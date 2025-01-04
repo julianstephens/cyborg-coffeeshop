@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
 # Shared properties
 class ProductBase(SQLModel):
+    stripe_id: str
     name: str = Field(min_length=1, max_length=255, unique=True)
     description: str | None = Field(default=None, max_length=255)
     currency: ISO4217 = Field(default="USD")
@@ -34,7 +35,7 @@ class Product(ProductBase, BaseTable, table=True):
     reviews: list["Review"] = Relationship(back_populates="product")
     images: list[str] | None = Field(
         sa_column=Column(ARRAY(String), nullable=True), default=None
-    )  # type: ignore
+    )
 
 
 # Properties to return via API, id is always required
