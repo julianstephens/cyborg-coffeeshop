@@ -16,33 +16,7 @@ from app.models import TokenPayload, User
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/access-token",
-    scopes={
-        "address": "Read-only access to addresses",
-        "address:write": "Full access to addresses",
-        "cart": "Read-only access to carts",
-        "cart:write": "Full access to carts",
-        "cart:item": "Read-only access to cart items",
-        "cart:item:write": "Full access to cart items",
-        "order": "Read-only access to orders",
-        "order:write": "Full access to orders",
-        "order:item": "Read-only access to items within an order",
-        "order:item:write": "Full access to items within an order",
-        "order:address": "Read-only access to addresses attached to an order",
-        "order:address:write": "Full access to addresses attached to an order",
-        "product": "Read-only access to products",
-        "product:write": "Full access to products",
-        "product:category": "Read-only access to product categories",
-        "product:category:write": "Full access to product categories",
-        "product:review": "Read-only access to product reviews",
-        "product:review:write": "Full access to product reviews",
-        "user": "Read-only access to users",
-        "user:write": "Write access to users",
-        "user:delete": "Delete access for users",
-        "user:me": "Read-only access to the current user.",
-        "user:me:write": "Full access to the current user.",
-        "user:me:password:write": "Full access to the current user's password.",
-        "utils": "Full access to utils",
-    },
+    scopes=settings.AUTH_SCOPES,
 )
 
 

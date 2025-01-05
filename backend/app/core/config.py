@@ -1,7 +1,10 @@
+import json
 import secrets
 import warnings
 from typing import Annotated, Any, Literal, Self
 
+import boto3
+from loguru import logger
 from pydantic import (
     AnyUrl,
     BeforeValidator,
@@ -10,8 +13,13 @@ from pydantic import (
     computed_field,
     model_validator,
 )
+from pydantic.fields import FieldInfo
 from pydantic_core import MultiHostUrl
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
 
 
 def parse_cors(v: Any) -> list[str] | str:
@@ -20,6 +28,45 @@ def parse_cors(v: Any) -> list[str] | str:
     elif isinstance(v, list | str):
         return v
     raise ValueError(v)
+
+
+class AWSSource(PydanticBaseSettingsSource):
+    _fields = ["AUTH_SCOPES"]
+    s3 = boto3.client("s3")
+
+    def __init__(self, settings_cls: type[BaseSettings]):
+        super().__init__(settings_cls)
+
+    def get_field_value(self, field: FieldInfo, field_name: str):
+        field_name = field.alias or field_name
+        field_value = self.current_state.get(field_name, None)
+
+        if field_value or field_name not in self._fields:
+            return field_value, field_name, False
+
+        try:
+            obj = self.s3.get_object(
+                Bucket=self.current_state.get("BUCKET_NAME"),
+                Key=f"{field_name.lower()}.json",
+            )
+            field_value = json.dumps(json.loads(obj.get("Body").read()))
+        except Exception:
+            logger.exception("unable to retrieve env var '{field_name}' from s3")
+
+        return field_value, field_name, False
+
+    def __call__(self) -> dict[str, Any]:
+        d: dict[str, Any] = {}
+        for field_name, field in self.settings_cls.model_fields.items():
+            field_value, field_key, value_is_complex = self.get_field_value(
+                field, field_name
+            )
+            field_value = self.prepare_field_value(
+                field_name, field, field_value, value_is_complex
+            )
+            if field_value is not None:
+                d[field_key] = field_value
+        return d
 
 
 class Settings(BaseSettings):
@@ -35,6 +82,9 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
     FRONTEND_HOST: str = "http://localhost:5173"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
+
+    BUCKET_NAME: str
+    AUTH_SCOPES: dict[str, str]
 
     BACKEND_CORS_ORIGINS: Annotated[
         list[AnyUrl] | str, BeforeValidator(parse_cors)
@@ -120,6 +170,23 @@ class Settings(BaseSettings):
         )
 
         return self
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        return (
+            init_settings,
+            env_settings,
+            dotenv_settings,
+            file_secret_settings,
+            AWSSource(settings_cls),
+        )
 
 
 settings = Settings()  # type: ignore

@@ -25,6 +25,7 @@ dependencies = [
   "pycountry>=24.6.1",
   "stripe>=11.4.1",
   "loguru>=0.7.3",
+  "boto3>=1.35.92",
 ]
 
 [tool.uv]
