@@ -128,10 +128,10 @@ def update_product_review(
         )
     try:
         review = next(r for r in product.reviews if r.id == review_id)
-    except Exception:
+    except Exception as ex:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Review not found"
-        )
+        ) from ex
     if not current_user.is_superuser and (review.customer_id != current_user.id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Not enough permissions"
@@ -164,10 +164,10 @@ def delete_product_review(
         )
     try:
         review = next(r for r in product.reviews if r.id == review_id)
-    except Exception:
+    except Exception as ex:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Review not found"
-        )
+        ) from ex
     if not current_user.is_superuser and (review.customer_id != current_user.id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Not enough permissions"

@@ -3,6 +3,7 @@ import uuid
 from loguru import logger
 from sqlmodel import Session, select
 
+from app.errors import ResourceNotFoundError
 from app.models import Product, ProductCreate
 
 
@@ -30,20 +31,20 @@ class ProductService:
             raise ValueError
 
         db_item: Product | None = None
-        if id and stripe_id or stripe_id:
+        if (id and stripe_id) or stripe_id:
             logger.debug("received product id and stripe id, stripe id preferred")
             db_item = self.session.exec(
                 select(Product).where(Product.stripe_id == stripe_id)
             ).first()
             if not db_item:
                 logger.error(f"unable to retrieve product with stripe id {stripe_id}")
-                raise Exception
+                raise ResourceNotFoundError
         if id:
             db_item = self.session.get(Product, id)
 
         if not db_item:
             logger.error(f"unable to retrieve product with id {id}")
-            raise Exception
+            raise ResourceNotFoundError
 
         update_data = product_in.model_dump(exclude_unset=True)
         db_item.sqlmodel_update(update_data)
@@ -54,20 +55,20 @@ class ProductService:
 
     def remove(self, id: uuid.UUID | None = None, stripe_id: str | None = None):
         db_item: Product | None = None
-        if id and stripe_id or stripe_id:
+        if (id and stripe_id) or stripe_id:
             logger.debug("received product id and stripe id, stripe id preferred")
             db_item = self.session.exec(
                 select(Product).where(Product.stripe_id == stripe_id)
             ).first()
             if not db_item:
                 logger.error(f"unable to retrieve product with stripe id {stripe_id}")
-                raise Exception
+                raise ResourceNotFoundError
         if id:
             db_item = self.session.get(Product, id)
 
         if not db_item:
             logger.error(f"unable to retrieve product with id {id}")
-            raise Exception
+            raise ResourceNotFoundError
 
         self.session.delete(db_item)
         self.session.commit()

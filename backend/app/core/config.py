@@ -1,7 +1,7 @@
 import json
 import secrets
 import warnings
-from typing import Annotated, Any, Literal, Self
+from typing import Annotated, Any, ClassVar, Literal, Self
 
 import boto3
 from loguru import logger
@@ -25,13 +25,13 @@ from pydantic_settings import (
 def parse_cors(v: Any) -> list[str] | str:
     if isinstance(v, str) and not v.startswith("["):
         return [i.strip() for i in v.split(",")]
-    elif isinstance(v, list | str):
+    if isinstance(v, list | str):
         return v
     raise ValueError(v)
 
 
 class AWSSource(PydanticBaseSettingsSource):
-    _fields = ["AUTH_SCOPES"]
+    _fields: ClassVar[list[str]] = ["AUTH_SCOPES"]
     s3 = boto3.client("s3")
 
     def __init__(self, settings_cls: type[BaseSettings]):
@@ -108,7 +108,7 @@ class Settings(BaseSettings):
 
     @computed_field  # type: ignore[prop-decorator]
     @property
-    def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
+    def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:  # noqa: N802
         return MultiHostUrl.build(
             scheme="postgresql+psycopg",
             username=self.POSTGRES_USER,

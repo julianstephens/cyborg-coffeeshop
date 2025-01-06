@@ -177,7 +177,7 @@ def register_user(session: SessionDep, user_in: UserRegister) -> Any:
         )
     user_create = UserCreate.model_validate(user_in)
     user = crud.create_user(session=session, user_create=user_create)
-    return user
+    return UserPublic(**user)
 
 
 @router.get("/{user_id}", response_model=UserPublic)
@@ -230,7 +230,7 @@ def update_user(
             )
 
     db_user = crud.update_user(session=session, db_user=db_user, user_in=user_in)
-    return db_user
+    return UserPublic(**db_user)
 
 
 @router.delete("/{user_id}")

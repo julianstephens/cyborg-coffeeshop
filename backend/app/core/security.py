@@ -17,8 +17,7 @@ def create_access_token(
 ) -> str:
     expire = datetime.now(UTC) + expires_delta
     claims = {"exp": expire, "sub": str(subject), "scopes": scopes}
-    encoded_jwt = jwt.encode(claims, settings.SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(claims, settings.SECRET_KEY, algorithm=ALGORITHM)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:

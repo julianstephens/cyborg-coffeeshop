@@ -44,9 +44,9 @@ async def webhook(request: Request, session: SessionDep):
 
     try:
         event = stripe.Event.construct_from(data, stripe.api_key)
-    except Exception:
+    except Exception as ex:
         logger.exception("unable to decode stripe webhook payload")
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST) from ex
 
     if settings.STRIPE_WEBHOOK_SECRET:
         sig_header = request.headers.get("stripe-signature")
@@ -54,9 +54,9 @@ async def webhook(request: Request, session: SessionDep):
             event = stripe.Webhook.construct_event(
                 await request.body(), sig_header, settings.STRIPE_WEBHOOK_SECRET
             )
-        except stripe.SignatureVerificationError:
+        except stripe.SignatureVerificationError as ex:
             logger.exception("failed to verify stripe webhook signature")
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST) from ex
 
     executor = ThreadPoolExecutor(max_workers=1)
     future = executor.submit(EventHandler.process, session=session, event=event)
@@ -65,7 +65,7 @@ async def webhook(request: Request, session: SessionDep):
     for f in running_or_err:
         try:
             f.result()
-        except Exception:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+        except Exception as ex:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST) from ex
 
     return {"success": True}

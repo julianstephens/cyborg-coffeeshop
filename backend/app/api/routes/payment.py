@@ -33,11 +33,11 @@ def create_checkout_session(
             if ex.code == "resource_missing":
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail=ex.user_message
-                )
+                ) from ex
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=ex.user_message,
-            )
+            ) from ex
 
     order_in = OrderCreate()
 
@@ -46,12 +46,12 @@ def create_checkout_session(
             session=session, order_in=order_in, customer=current_user.id
         )
         logger.info(f"order {order.id} created for {current_user.id}")
-    except Exception:
+    except Exception as ex:
         logger.exception("unable to create new order")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unable to create order",
-        )
+        ) from ex
 
     stripe_session = stripe.checkout.Session.create(
         line_items=line_items,
@@ -67,11 +67,11 @@ def create_checkout_session(
     order_in = OrderUpdate(stripe_checkout_session=stripe_session.id)
     try:
         crud.update_order(session=session, db_order=order, order_in=order_in)
-    except Exception:
+    except Exception as ex:
         logger.exception("unable to update order")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unable to create order",
-        )
+        ) from ex
 
     return {"clientSecret": stripe_session.client_secret}

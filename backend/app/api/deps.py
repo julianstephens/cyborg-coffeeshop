@@ -42,13 +42,13 @@ def get_current_user(
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
         token_data = TokenPayload.model_validate(payload)
-    except (InvalidTokenError, ValidationError):
+    except (InvalidTokenError, ValidationError) as ex:
         logger.exception("something went wrong validating credentials")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers=scope_header,
-        )
+        ) from ex
     user = session.get(User, token_data.sub)
     if not user:
         raise HTTPException(
@@ -79,11 +79,11 @@ def get_scopes(token: TokenDep):
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
         token_data = TokenPayload.model_validate(payload)
-    except (InvalidTokenError, ValidationError):
+    except (InvalidTokenError, ValidationError) as ex:
         logger.exception("something went wrong validating credentials")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
-        )
+        ) from ex
     else:
         return token_data.scopes
