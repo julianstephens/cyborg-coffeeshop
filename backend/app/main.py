@@ -18,6 +18,13 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     generate_unique_id_function=custom_generate_unique_id,
+    servers=[{"url": "http://localhost:8000"}],
+    description="API for the Cyborg Coffeeshop store",
+    contact={
+        "name": settings.PROJECT_CONTACT_NAME,
+        "email": settings.PROJECT_CONTACT_EMAIL,
+        "url": settings.PROJECT_CONTACT_URL,
+    },
 )
 
 # Set all CORS enabled origins

@@ -28,7 +28,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/",
+    "",
     dependencies=[Security(get_current_user, scopes=["user"])],
     response_model=UsersPublic,
 )
@@ -50,7 +50,7 @@ def read_users(
 
 
 @router.post(
-    "/",
+    "",
     dependencies=[Security(get_current_user, scopes=["user:write"])],
     response_model=UserPublic,
 )

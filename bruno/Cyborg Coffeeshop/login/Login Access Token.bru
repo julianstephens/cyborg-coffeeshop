@@ -11,15 +11,14 @@ post {
 }
 
 body:form-urlencoded {
-  username: admin@example.com
-  password: iPlJZ72cxl00
+  username: {{username}}
+  password: {{password}}
   scope: user:me
-  ~grant_type:
-  ~client_id:
-  ~client_secret:
+  ~grant_type: 
+  ~client_id: 
+  ~client_secret: 
 }
 
 script:post-response {
-  bru.setEnvVar("token", res.getBody().access_token)
-  bru.setEnvVar("test", res.body.access_token)
+  bru.setEnvVar("token", res.body.access_token)
 }

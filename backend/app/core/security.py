@@ -13,7 +13,7 @@ ALGORITHM = "HS256"
 
 
 def create_access_token(
-    subject: str | Any, expires_delta: timedelta, scopes: str
+    subject: str | Any, expires_delta: timedelta, scopes: list[str]
 ) -> str:
     expire = datetime.now(UTC) + expires_delta
     claims = {"exp": expire, "sub": str(subject), "scopes": scopes}

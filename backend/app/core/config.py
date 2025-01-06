@@ -84,6 +84,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
 
     BUCKET_NAME: str
+    LAMBDA_FUNC_NAME: str
     AUTH_SCOPES: dict[str, str]
 
     BACKEND_CORS_ORIGINS: Annotated[
@@ -126,6 +127,10 @@ class Settings(BaseSettings):
 
     STRIPE_API_KEY: str
     STRIPE_WEBHOOK_SECRET: str | None = None
+
+    PROJECT_CONTACT_NAME: str
+    PROJECT_CONTACT_EMAIL: str
+    PROJECT_CONTACT_URL: str
 
     # TODO: update type to EmailStr when sqlmodel supports it
     EMAILS_FROM_EMAIL: str | None = None

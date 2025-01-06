@@ -26,7 +26,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/",
+    "",
     dependencies=[Security(get_current_user, scopes=["product"])],
     response_model=ProductsPublic,
 )

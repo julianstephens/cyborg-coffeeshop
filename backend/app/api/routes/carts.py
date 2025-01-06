@@ -22,7 +22,7 @@ from app.models import (
 router = APIRouter()
 
 
-@router.get("/", response_model=CartsPublic)
+@router.get("", response_model=CartsPublic)
 def read_carts(
     session: SessionDep,
     current_user: Annotated[User, Security(get_current_user, scopes=["cart"])],
@@ -77,7 +77,7 @@ def read_cart(
     return cart
 
 
-@router.post("/", response_model=CartPublic)
+@router.post("", response_model=CartPublic)
 def create_cart(
     *,
     session: SessionDep,
@@ -148,6 +148,7 @@ def delete_cart(
 @router.get("/{id}/items", response_model=CartItemsPublic)
 def read_cart_items(
     session: SessionDep,
+    id: uuid.UUID,
     current_user: Annotated[User, Security(get_current_user, scopes=["cart:item"])],
 ) -> Any:
     """

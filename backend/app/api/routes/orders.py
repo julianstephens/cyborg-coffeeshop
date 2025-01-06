@@ -23,7 +23,7 @@ from app.models import (
 router = APIRouter()
 
 
-@router.get("/", response_model=OrdersPublic)
+@router.get("", response_model=OrdersPublic)
 def read_orders(
     session: SessionDep,
     current_user: Annotated[User, Security(get_current_user, scopes=["order"])],
@@ -77,7 +77,7 @@ def read_order(
     return order
 
 
-@router.post("/", response_model=OrderPublic)
+@router.post("", response_model=OrderPublic)
 def create_order(
     *,
     session: SessionDep,
@@ -148,6 +148,7 @@ def delete_order(
 @router.get("/{id}/items", response_model=OrderItemsPublic)
 def read_order_items(
     session: SessionDep,
+    id: uuid.UUID,
     current_user: Annotated[User, Security(get_current_user, scopes=["order:item"])],
 ) -> Any:
     """
@@ -242,6 +243,7 @@ def delete_order_item(
 @router.get("/{id}/addresses", response_model=AddressesPublic)
 def read_order_addresses(
     session: SessionDep,
+    id: uuid.UUID,
     current_user: Annotated[User, Security(get_current_user, scopes=["order:address"])],
 ) -> Any:
     """

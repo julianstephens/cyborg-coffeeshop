@@ -36,7 +36,7 @@ def read_address(session: SessionDep, id: uuid.UUID) -> Any:
     return address
 
 
-@router.post("/", response_model=AddressPublic)
+@router.post("", response_model=AddressPublic)
 def create_address(
     *,
     session: SessionDep,
