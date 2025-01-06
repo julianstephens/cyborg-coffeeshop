@@ -8,3 +8,7 @@ node_modules/
 .terraform
 data/
 tmp/
+
+.flaskenv*
+!.env.project
+!.env.vault
