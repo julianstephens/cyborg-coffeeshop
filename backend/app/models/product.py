@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 # Shared properties
 class ProductBase(SQLModel):
-    stripe_id: str
+    stripe_id: str = Field(unique=True)
     name: str = Field(min_length=1, max_length=255, unique=True)
     description: str | None = Field(default=None, max_length=255)
     currency: ISO4217 = Field(default="USD")

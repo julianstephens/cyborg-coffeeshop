@@ -1,8 +1,7 @@
-import json
 from concurrent.futures import ThreadPoolExecutor, wait
 
 import stripe
-from fastapi import APIRouter, Request, Security, status
+from fastapi import APIRouter, HTTPException, Request, Security, status
 from loguru import logger
 from pydantic.networks import EmailStr
 
@@ -41,30 +40,32 @@ async def health_check() -> bool:
 async def webhook(request: Request, session: SessionDep):
     event = None
     data = await request.json()
+    logger.debug(f"got event {type(data)}")
 
     try:
-        event = json.loads(data)
-    except json.decoder.JSONDecodeError:
+        event = stripe.Event.construct_from(data, stripe.api_key)
+    except Exception:
         logger.exception("unable to decode stripe webhook payload")
-        return {"success": False}
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
     if settings.STRIPE_WEBHOOK_SECRET:
         sig_header = request.headers.get("stripe-signature")
         try:
             event = stripe.Webhook.construct_event(
-                data, sig_header, settings.STRIPE_WEBHOOK_SECRET
+                await request.body(), sig_header, settings.STRIPE_WEBHOOK_SECRET
             )
         except stripe.SignatureVerificationError:
             logger.exception("failed to verify stripe webhook signature")
-            return {"success": False}
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
     executor = ThreadPoolExecutor(max_workers=1)
-    future = executor.submit(EventHandler.process, session, event)
+    future = executor.submit(EventHandler.process, session=session, event=event)
 
-    for _, running_or_err in wait([future], timeout=1.5, return_when="FIRST_EXCEPTION"):
+    _, running_or_err = wait([future], timeout=1.5, return_when="FIRST_EXCEPTION")
+    for f in running_or_err:
         try:
-            running_or_err.result()
+            f.result()
         except Exception:
-            return {"success": False}
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
     return {"success": True}

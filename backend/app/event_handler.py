@@ -6,7 +6,9 @@ from sqlmodel import Session
 
 from app import crud
 from app.core.config import settings
-from app.models import Order, OrderUpdate
+from app.models import Order, OrderUpdate, ProductCreate
+from app.services import ProductService
+from app.utils import parse_stripe_price
 
 stripe.api_key = settings.STRIPE_API_KEY
 
@@ -39,16 +41,55 @@ def parse_payment_intent(
 
 class EventHandler:
     @staticmethod
-    def process(session: Session, event: Any):
-        event_type = event["type"]
+    def process(*, session: Session, event: stripe.Event):
+        ps = ProductService(session)
+
+        event_type = event.type
         match event_type:
-            case "payment_intent.amount_capturable_update":
+            case "product.created":
+                log_start(event_type)
+                data = stripe.Product.construct_from(event.data.object, stripe.api_key)
+                price = stripe.Price.get(data.default_price)  # type: ignore
+                prod_in = ProductCreate(
+                    stripe_id=data.id,
+                    name=data.name,
+                    description=data.description,
+                    price=parse_stripe_price(price.unit_amount_decimal),
+                    available_quantity=0,
+                    images=data.images if len(data.images) > 0 else None,
+                )
+                ps.add(prod_in)
+                log_end(event_type)
+                return
+            case "product.updated":
+                log_start(event_type)
+                data = stripe.Product.construct_from(event.data.object, stripe.api_key)
+                price = stripe.Price.get(data.default_price)  # type: ignore
+                prod_in = ProductCreate(
+                    stripe_id=data.id,
+                    name=data.name,
+                    description=data.description,
+                    price=parse_stripe_price(price.unit_amount_decimal),
+                    available_quantity=0,
+                    images=data.images if len(data.images) > 0 else None,
+                )
+                ps.update(stripe_id=data.id, product_in=prod_in)
+                log_end(event_type)
+                return
+            case "product.deleted":
+                log_start(event_type)
+                data = stripe.Product.construct_from(event.data.object, stripe.api_key)
+                ps.remove(stripe_id=data.id)
+                log_end(event_type)
+                return
+            case "payment_intent.amount_capturable_updated":
                 log_start(event_type)
                 res = parse_payment_intent(session, event)
                 if not res:
                     return
                 # TODO: process pi
                 log_end(event_type)
+                return
             case "payment_intent.created":
                 log_start(event_type)
                 res = parse_payment_intent(session, event)
@@ -59,18 +100,18 @@ class EventHandler:
                 order_in = OrderUpdate(stripe_payment_intent=pi.id)
                 crud.update_order(session=session, db_order=order, order_in=order_in)
                 log_end(event_type)
+                return
             case "payment_intent.canceled":
                 log_start(event_type)
-                pass
                 log_end(event_type)
+                return
             case "payment_intent.payment_failed":
                 log_start(event_type)
-                pass
                 log_end(event_type)
+                return
             case "payment_intent.succeeded":
                 log_start(event_type)
-                pass
                 log_end(event_type)
+                return
             case _:
                 logger.error(f"received unrecognized stripe webhook event {event_type}")
-                raise ValueError
