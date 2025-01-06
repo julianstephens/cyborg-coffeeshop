@@ -68,6 +68,10 @@ def create_products(session: Session):
     return created
 
 
+def get_unique_colors(x):
+    return random.choices(["teal", "purple", "blue", "red", "green"], k=x)
+
+
 def init_db(session: Session) -> None:
     # Tables should be created with Alembic migrations
     # But if you don't want to use migrations, create
@@ -93,14 +97,13 @@ def init_db(session: Session) -> None:
     categories = session.exec(select(Category)).all()
     if len(categories) == 0:
         cats = ["beans", "accessories"]
-        for c in cats:
-            c_in = CategoryCreate(
-                name=c, color=random.choice(["teal", "purple", "blue", "red", "green"])
-            )
+        colors = get_unique_colors(len(cats))
+        for i, c in enumerate(cats):
+            c_in = CategoryCreate(name=c, color=colors[i])
             crud.create_category(session=session, category_in=c_in)
 
     products = create_products(session)
-    logger.debug("created {num_prod} products", num_prod=len(products))
+    logger.debug("seeded db with {num_prod} products", num_prod=len(products))
 
     for p in products:
         rating = round(random.uniform(0.5, 5) * 2) / 2

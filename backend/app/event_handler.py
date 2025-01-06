@@ -4,7 +4,7 @@ import stripe
 from loguru import logger
 from sqlmodel import Session
 
-from app import crud
+import app.crud as crud
 from app.core.config import settings
 from app.models import Order, OrderUpdate, ProductCreate
 from app.services import ProductService

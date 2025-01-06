@@ -22,9 +22,9 @@ api:              ## Start API
 	@cd ./backend && fastapi dev --host=0.0.0.0 --reload
 
 aws:              ## Create AWS resources
-	@tf init -upgrade
-	@tf plan
-	@tf apply -auto-approve
+	@terraform init -upgrade
+	@terraform plan
+	@terraform apply -auto-approve
 
 clean:            ## Remove AWS resources
 	@aws s3 rm s3://cyborg-coffeeshop-data --recursive
